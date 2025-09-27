@@ -1,0 +1,221 @@
+<!-- analytics.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Themed Site · Analytics</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <!-- D3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html">
+            <img src="img/logo.png" class="brand__logo" alt="Logo">
+            <span class="brand__name">My Themed Site</span>
+        </a>
+        <nav class="nav">
+            <a class="nav__link" href="index.html">Home</a>
+            <a class="nav__link" href="aboutus.html">About</a>
+            <a class="nav__link" href="crud.html">CRUD</a>
+            <a class="nav__link nav__link--active" href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 class="h1">Data Analytics</h1>
+        <p class="lead">Compare visualizations using Chart.js and D3.js on the same dataset.</p>
+
+        <!-- Controls -->
+        <div class="card" style="margin-bottom:1rem">
+            <div class="grid grid--2">
+                <div>
+                    <label class="label" for="libSelect">Visualization Library</label>
+                    <select id="libSelect" class="select">
+                        <option value="chartjs" selected>Chart.js</option>
+                        <option value="d3">D3.js</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label" for="typeSelect">Chart Type</label>
+                    <select id="typeSelect" class="select">
+                        <option value="line" selected>Line</option>
+                        <option value="bar">Bar</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button id="toggleFill" class="btn btn--ghost" type="button">Toggle Fill (Line)</button>
+            </div>
+        </div>
+
+        <!-- Viz containers -->
+        <div class="card" style="height:380px">
+            <canvas id="chartjsCanvas" style="width:100%; height:100%"></canvas>
+            <svg id="d3Svg" style="display:none; width:100%; height:100%"></svg>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> Domenick Dobbs</p>
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // The Data shared to be displayed
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const values = [12, 19, 8, 15, 22, 18, 24];
+
+        // Elements
+        const libSelect = document.getElementById('libSelect');
+        const typeSelect = document.getElementById('typeSelect');
+        const btnFill = document.getElementById('toggleFill');
+        const canvas = document.getElementById('chartjsCanvas');
+        const svg = document.getElementById('d3Svg');
+
+
+        const state = { lib: 'chartjs', type: 'line', filled: true };
+        let chartjsInstance = null;
+
+        // the chart.js
+        function renderChartJS() {
+            if (chartjsInstance) chartjsInstance.destroy();
+            chartjsInstance = new Chart(canvas, {
+                type: state.type,
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Sample Metric',
+                        data: values,
+                        fill: state.type === 'line' ? state.filled : false,
+                        tension: state.type === 'line' ? 0.35 : 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // the d3.js 
+        function clearD3() { d3.select(svg).selectAll('*').remove(); }
+
+        function renderD3() {
+            clearD3();
+
+            const pad = { top: 20, right: 20, bottom: 30, left: 40 };
+            const width = svg.clientWidth - pad.left - pad.right;
+            const height = svg.clientHeight - pad.top - pad.bottom;
+
+            const root = d3.select(svg)
+                .attr('viewBox', `0 0 ${svg.clientWidth} ${svg.clientHeight}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .append('g')
+                .attr('transform', `translate(${pad.left},${pad.top})`);
+
+            const brand = '#6aa9ff';
+
+            if (state.type === 'bar') {
+                const x = d3.scaleBand().domain(labels).range([0, width]).padding(0.2);
+                const y = d3.scaleLinear().domain([0, d3.max(values) || 1]).nice().range([height, 0]);
+
+                root.append('g').attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x).tickSizeOuter(0));
+                root.append('g').call(d3.axisLeft(y).ticks(6));
+
+                root.selectAll('rect')
+                    .data(values)
+                    .enter()
+                    .append('rect')
+                    .attr('x', (_, i) => x(labels[i]))
+                    .attr('y', d => y(d))
+                    .attr('width', x.bandwidth())
+                    .attr('height', d => height - y(d))
+                    .attr('rx', 6).attr('ry', 6)
+                    .attr('fill', brand);
+
+            } else {
+                const x = d3.scalePoint().domain(labels).range([0, width]);
+                const y = d3.scaleLinear().domain([0, d3.max(values) || 1]).nice().range([height, 0]);
+
+                root.append('g').attr('transform', `translate(0,${height})`)
+                    .call(d3.axisBottom(x).tickSizeOuter(0));
+                root.append('g').call(d3.axisLeft(y).ticks(6));
+
+                const curve = d3.curveCatmullRom.alpha(0.5);
+
+                if (state.filled) {
+                    const area = d3.area()
+                        .x((_, i) => x(labels[i]))
+                        .y0(height)
+                        .y1(d => y(d))
+                        .curve(curve);
+
+                    root.append('path')
+                        .datum(values)
+                        .attr('d', area)
+                        .attr('fill', 'rgba(106,169,255,0.25)');
+                }
+
+                const line = d3.line()
+                    .x((_, i) => x(labels[i]))
+                    .y(d => y(d))
+                    .curve(curve);
+
+                root.append('path')
+                    .datum(values)
+                    .attr('d', line)
+                    .attr('fill', 'none')
+                    .attr('stroke', brand)
+                    .attr('stroke-width', 3);
+
+                root.selectAll('circle')
+                    .data(values)
+                    .enter()
+                    .append('circle')
+                    .attr('cx', (_, i) => x(labels[i]))
+                    .attr('cy', d => y(d))
+                    .attr('r', 4)
+                    .attr('fill', brand);
+            }
+        }
+
+        //  Main render function
+        function render() {
+            const usingChartJS = state.lib === 'chartjs';
+            canvas.style.display = usingChartJS ? 'block' : 'none';
+            svg.style.display = usingChartJS ? 'none' : 'block';
+            if (usingChartJS) renderChartJS(); else renderD3();
+        }
+
+        // Event listeners touching up
+        libSelect.addEventListener('change', () => { state.lib = libSelect.value; render(); });
+        typeSelect.addEventListener('change', () => { state.type = typeSelect.value; render(); });
+        btnFill.addEventListener('click', () => {
+            state.filled = !state.filled;
+            if (state.lib === 'chartjs') {
+                if (state.type === 'line') {
+                    chartjsInstance.data.datasets[0].fill = state.filled;
+                    chartjsInstance.update();
+                }
+            } else {
+                renderD3();
+            }
+        });
+
+        window.addEventListener('resize', () => { if (state.lib === 'd3') renderD3(); });
+
+        render();
+    </script>
+</body>
+
+</html>

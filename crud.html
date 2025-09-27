@@ -1,0 +1,115 @@
+<!-- crud.html -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Themed Site · CRUD</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html"><img src="img/logo.png" class="brand__logo" alt="Logo"><span
+                class="brand__name">My Themed Site</span></a>
+        <nav class="nav">
+            <a class="nav__link" href="index.html">Home</a>
+            <a class="nav__link" href="aboutus.html">About</a>
+            <a class="nav__link nav__link--active" href="crud.html">CRUD</a>
+            <a class="nav__link" href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 class="h1">CRUD Demo</h1>
+        <p class="lead">CRUD (Create, read, update, delete) on mock themed data (No database, stored in
+            memory/localStorage).</p>
+
+        <form id="itemForm" class="card form mt-3">
+            <div>
+                <label class="label" for="title">Title</label>
+                <input class="input" id="title" required />
+            </div>
+            <div>
+                <label class="label" for="value">Value</label>
+                <input class="input" id="value" required />
+            </div>
+            <div class="mt-2">
+                <button type="submit" class="btn btn--primary">Create / Update</button>
+                <button id="resetBtn" type="button" class="btn btn--ghost">Reset</button>
+            </div>
+        </form>
+
+        <div class="table-wrap mt-4">
+            <table id="itemsTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Value</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> Domenick Dobbs</p>
+    </footer>
+
+    <script>
+        const KEY = "demoItems";
+        const $form = document.getElementById("itemForm");
+        const $title = document.getElementById("title");
+        const $value = document.getElementById("value");
+        const $tbody = document.querySelector("#itemsTable tbody");
+        const $reset = document.getElementById("resetBtn");
+        let editingIndex = null;
+
+        const readAll = () => JSON.parse(localStorage.getItem(KEY) || "[]");
+        const writeAll = (items) => localStorage.setItem(KEY, JSON.stringify(items));
+
+        function render() {
+            const items = readAll();
+            $tbody.innerHTML = items.map((it, i) =>
+                `<tr>
+           <td>${it.title}</td>
+           <td>${it.value}</td>
+           <td>
+             <button class="btn btn--ghost" data-edit="${i}">Edit</button>
+             <button class="btn btn--ghost" data-del="${i}">Delete</button>
+           </td>
+         </tr>`).join("");
+        }
+
+        $form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const items = readAll();
+            const record = { title: $title.value.trim(), value: $value.value.trim() };
+            if (editingIndex === null) { items.push(record); } else { items[editingIndex] = record; }
+            writeAll(items); editingIndex = null; $form.reset(); render();
+        });
+
+        $tbody.addEventListener("click", (e) => {
+            const idxEdit = e.target.getAttribute("data-edit");
+            const idxDel = e.target.getAttribute("data-del");
+            if (idxEdit !== null) {
+                const items = readAll(); const it = items[Number(idxEdit)];
+                $title.value = it.title; $value.value = it.value; editingIndex = Number(idxEdit);
+            }
+            if (idxDel !== null) {
+                const items = readAll(); items.splice(Number(idxDel), 1); writeAll(items); render();
+            }
+        });
+
+        $reset.addEventListener("click", () => { editingIndex = null; $form.reset(); });
+
+        // boot
+        document.getElementById("year").textContent = new Date().getFullYear();
+        render();
+    </script>
+</body>
+
+</html>

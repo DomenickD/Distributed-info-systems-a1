@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Themed Site · Home</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html">
+            <img src="img/logo.png" alt="Logo" class="brand__logo">
+            <span class="brand__name">My Themed Site</span>
+        </a>
+        <nav class="nav">
+            <a class="nav__link nav__link--active" href="index.html">Home</a>
+            <a class="nav__link" href="aboutus.html">About</a>
+            <a class="nav__link" href="crud.html">CRUD</a>
+            <a class="nav__link" href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div class="grid grid--2">
+                <div>
+                    <h1 class="h1">Distributed Information Systems</h1>
+                    <p class="lead">
+                        Clean HTML, professional CSS, and a tiny bit of JavaScript for the flow.
+                        Fully Functional, but locally hosted CRUD demo and Analytics pages to demo functionality.
+                    </p>
+                    <div class="mt-3">
+                        <a class="btn btn--primary" href="crud.html">Try the CRUD Demo</a>
+                        <a class="btn btn--ghost" href="analytics.html">View Analytics</a>
+                    </div>
+                </div>
+                <div>
+                    <img src="img/Hero.png" alt="Hero"
+                        style="width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(0,0,0,.35)">
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-4 grid grid--3">
+            <article class="card">
+                <h3 style="margin:.2rem 0 .4rem">Responsive by default</h3>
+                <p class="mt-2">The layout uses simple CSS grids and should scale down nicely on tablets and phones.</p>
+            </article>
+            <article class="card">
+                <h3 style="margin:.2rem 0 .4rem">Accessible & semantic</h3>
+                <p class="mt-2">Proper headings, labels, and contrast-friendly color tokens.</p>
+            </article>
+            <article class="card">
+                <h3 style="margin:.2rem 0 .4rem">Easy to build on</h3>
+                <p class="mt-2">Add components or pages without touching the core styles too much.</p>
+            </article>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> Domenick Dobbs • <a href="https://github.com/DomenickD/Distributed-info-systems-a1"
+                target="_blank" rel="noopener">GitHub Repo</a></p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>

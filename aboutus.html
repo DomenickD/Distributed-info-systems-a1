@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Themed Site · About</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html">
+            <img src="img/logo.png" alt="Logo" class="brand__logo">
+            <span class="brand__name">My Themed Site</span>
+        </a>
+        <nav class="nav">
+            <a class="nav__link" href="index.html">Home</a>
+            <a class="nav__link nav__link--active" href="aboutus.html">About</a>
+            <a class="nav__link" href="crud.html">CRUD</a>
+            <a class="nav__link" href="analytics.html">Analytics</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h1 class="h1">About Me</h1>
+            <p class="lead">
+                Hello! I'm Domenick Dobbs, a graduate student at the University of South Florida pursuing a Master's in
+                AI. With a background in web development, Data Science, and AI programming; I specialize in building
+                responsive and accessible tools for customers. This project showcases my lesser used skills in HTML,
+                CSS, and JavaScript, along with my ability to implement CRUD functionality and data visualization using
+                Chart.js. I'm excited to share my work with you!
+            </p>
+        </section>
+
+        <section class="grid grid--2 mt-4">
+            <article class="card">
+                <h2 style="margin:.2rem 0 .6rem">My Approach</h2>
+                <p>
+                    I start with building out the structure in html. Then I add styles using CSS custom properties which
+                    I often find inspiration from online. Finally I add interactivity with vanilla JavaScript. The
+                    goal is to keep things simple, clean, and easy to build on if need be.
+                </p>
+                <ul class="mt-3" style="padding-left:1.1rem; margin:0">
+                    <li>Clean, readable code</li>
+                    <li>Consistent design tokens</li>
+                    <li>Minimal dependencies</li>
+                </ul>
+            </article>
+
+            <article class="card">
+                <h2 style="margin:.2rem 0 .6rem">Tech Stack</h2>
+                <ul style="padding-left:1.1rem; margin:0">
+                    <li><strong>HTML5</strong> for structure</li>
+                    <li><strong>CSS</strong> with custom properties for a modern theme</li>
+                    <li><strong>JavaScript</strong> (vanilla) for simple interactions</li>
+                    <li><strong>Chart.js</strong> on the Analytics page (via CDN)</li>
+                    <li><strong>D3.js</strong> on the Analytics page (via CDN)</li>
+                </ul>
+
+                <div class="mt-3">
+                    <a class="btn btn--primary" href="https://github.com/DomenickD/Distributed-info-systems-a1"
+                        target="_blank" rel="noopener">View Source</a>
+                    <a class="btn btn--ghost" href="analytics.html">See Analytics</a>
+                </div>
+            </article>
+        </section>
+
+        <section class="mt-4 card">
+            <h2 style="margin:.2rem 0 .6rem">Contact</h2>
+            <form class="form" onsubmit="event.preventDefault(); alert('Message sent (This is just a demo)!');">
+                <div>
+                    <label class="label" for="name">Name</label>
+                    <input class="input" id="name" placeholder="Your name" required />
+                </div>
+                <div>
+                    <label class="label" for="email">Email</label>
+                    <input class="input" id="email" type="email" placeholder="you@example.com" required />
+                </div>
+                <div>
+                    <label class="label" for="msg">Message</label>
+                    <textarea class="textarea" id="msg" rows="5" placeholder="How can we help?" required></textarea>
+                </div>
+                <button class="btn btn--primary" type="submit">Send</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>© <span id="year"></span> Domenick Dobbs • <a
+                href="https://https://github.com/DomenickD/Distributed-info-systems-a1" target="_blank"
+                rel="noopener">GitHub Repo</a></p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
