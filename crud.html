@@ -1,114 +1,440 @@
-<!-- crud.html -->
+<!-- Author: Domenick Dobbs
+Date: 9/27/2025
+Assignments: Distributed Information Systems - Assignment 1 -->
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Assignment 1 · CRUD</title>
+    <title>Dobby's E-Commerce · Catalog</title>
     <link rel="stylesheet" href="css/styles.css" />
+    <!-- Chart.js pinned with /dist to avoid sourcemap warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 </head>
 
 <body>
     <header class="site-header">
-        <a class="brand" href="index.html"><img src="img/logo.png" class="brand__logo" alt="Logo"><span
-                class="brand__name">Assignment 1</span></a>
+        <a class="brand" href="index.html"><img src="img/logo.png" class="brand__logo" alt="Logo">
+            <span class="brand__name">Dobby's E-Commerce</span></a>
         <nav class="nav">
             <a class="nav__link" href="index.html">Home</a>
             <a class="nav__link" href="aboutus.html">About</a>
-            <a class="nav__link nav__link--active" href="crud.html">CRUD</a>
+            <a class="nav__link nav__link--active" href="crud.html">Catalog (CRUD)</a>
             <a class="nav__link" href="analytics.html">Analytics</a>
         </nav>
     </header>
 
     <main class="container">
-        <h1 class="h1">CRUD Demo</h1>
-        <p class="lead">CRUD (Create, read, update, delete) on mock themed data (No database, stored in
-            memory/localStorage).</p>
+        <h1 class="h1">Catalog Manager</h1>
+        <p class="lead">Add or edit products and define a delivery window. Select a product to view its delivery
+            timeline by month.</p>
 
-        <form id="itemForm" class="card form mt-3">
-            <div>
-                <label class="label" for="title">Title</label>
-                <input class="input" id="title" required />
+        <!-- Product Form -->
+        <form id="productForm" class="card form mt-3">
+            <div class="grid grid--3">
+                <div>
+                    <label class="label" for="name">Product Name</label>
+                    <input class="input" id="name" placeholder="e.g., Enchanted Mug" required />
+                </div>
+                <div>
+                    <label class="label" for="sku">SKU</label>
+                    <input class="input" id="sku" placeholder="e.g., DOB-001" />
+                </div>
+                <div>
+                    <label class="label" for="price">Price ($)</label>
+                    <input class="input" id="price" type="number" min="0" step="0.01" placeholder="19.99" required />
+                </div>
             </div>
-            <div>
-                <label class="label" for="value">Value</label>
-                <input class="input" id="value" required />
+
+            <div class="grid grid--3">
+                <div>
+                    <label class="label" for="qty">Quantity</label>
+                    <input class="input" id="qty" type="number" min="0" placeholder="10" required />
+                </div>
+                <div>
+                    <label class="label" for="start">Delivery Start</label>
+                    <input class="input" id="start" type="date" required />
+                </div>
+                <div>
+                    <label class="label" for="end">Delivery End</label>
+                    <input class="input" id="end" type="date" required />
+                </div>
             </div>
+
             <div class="mt-2">
-                <button type="submit" class="btn btn--primary">Create / Update</button>
+                <button type="submit" class="btn btn--primary">Save Product</button>
                 <button id="resetBtn" type="button" class="btn btn--ghost">Reset</button>
             </div>
         </form>
 
+        <!-- Catalog Table -->
         <div class="table-wrap mt-4">
-            <table id="itemsTable">
+            <table id="productsTable">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Value</th>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Delivery Window</th>
+                        <th>Days</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
+
+        <!-- Delivery Timeline -->
+        <section class="card mt-4" id="timelineCard" style="display:none">
+            <h2 style="margin:.2rem 0 .6rem">Delivery Timeline</h2>
+            <p class="mt-2" id="timelineMeta" style="color: var(--muted)"></p>
+
+            <!-- Month controls -->
+            <div class="grid grid--3" style="align-items:end; gap:.75rem">
+                <div>
+                    <label class="label" for="monthPicker">Viewing Month</label>
+                    <input class="input" id="monthPicker" type="month" />
+                </div>
+                <div>
+                    <button id="prevMonth" class="btn btn--ghost" type="button" style="margin-top:1.95rem">←
+                        Prev</button>
+                    <button id="nextMonth" class="btn btn--ghost" type="button" style="margin-top:1.95rem">Next
+                        →</button>
+                </div>
+                <div id="continuationBadge" class="mt-3" style="text-align:right; color:var(--muted)"></div>
+            </div>
+
+            <div style="height:300px" class="mt-3">
+                <canvas id="timelineChart" style="width:100%;height:100%"></canvas>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer">
-        <p>© <span id="year"></span> Domenick Dobbs</p>
+        <p>© <span id="year"></span> Domenick Dobbs • <a href="https://github.com/DomenickD/Distributed-info-systems-a1"
+                target="_blank" rel="noopener">GitHub Repo</a></p>
     </footer>
 
     <script>
-        const KEY = "demoItems";
-        const $form = document.getElementById("itemForm");
-        const $title = document.getElementById("title");
-        const $value = document.getElementById("value");
-        const $tbody = document.querySelector("#itemsTable tbody");
-        const $reset = document.getElementById("resetBtn");
-        let editingIndex = null;
+        document.getElementById("year").textContent = new Date().getFullYear();
 
+        // --- Storage helpers ---
+        const KEY = "dobbyCatalog";
         const readAll = () => JSON.parse(localStorage.getItem(KEY) || "[]");
         const writeAll = (items) => localStorage.setItem(KEY, JSON.stringify(items));
 
-        function render() {
+        // --- Elements ---
+        const $form = document.getElementById("productForm");
+        const $name = document.getElementById("name");
+        const $sku = document.getElementById("sku");
+        const $price = document.getElementById("price");
+        const $qty = document.getElementById("qty");
+        const $start = document.getElementById("start");
+        const $end = document.getElementById("end");
+        const $tbody = document.querySelector("#productsTable tbody");
+        const $reset = document.getElementById("resetBtn");
+        const $card = document.getElementById("timelineCard");
+        const $meta = document.getElementById("timelineMeta");
+        const $canvas = document.getElementById("timelineChart");
+        const $monthPicker = document.getElementById("monthPicker");
+        const $prev = document.getElementById("prevMonth");
+        const $next = document.getElementById("nextMonth");
+        const $cont = document.getElementById("continuationBadge");
+
+        let editingIndex = null;
+        let tlChart = null;
+        let lastProduct = null;
+        let viewMonth = null; // date pointing at the 1st of the month
+        let incomingAdd = false; // true when page was opened from add-to-cart
+        let incomingOriginalQty = null;
+
+        // make a few demo products if empty 
+        (function seed() {
             const items = readAll();
-            $tbody.innerHTML = items.map((it, i) =>
-                `<tr>
-           <td>${it.title}</td>
-           <td>${it.value}</td>
-           <td>
-             <button class="btn btn--ghost" data-edit="${i}">Edit</button>
-             <button class="btn btn--ghost" data-del="${i}">Delete</button>
-           </td>
-         </tr>`).join("");
+            if (items.length) return;
+            const today = new Date();
+            const fmt = (d) => d.toISOString().slice(0, 10);
+            const plus = (days) => { const x = new Date(today); x.setDate(x.getDate() + days); return fmt(x); };
+            writeAll([
+                { name: "Enchanted Mug", sku: "DOB-001", price: 19.99, qty: 12, start: fmt(today), end: plus(35) }, // spans months
+                { name: "House-Elf Socks (Pair)", sku: "DOB-002", price: 7.50, qty: 40, start: plus(2), end: plus(9) },
+                { name: "Spellbook Journal", sku: "DOB-003", price: 14.00, qty: 25, start: plus(25), end: plus(58) } // spans months
+            ]);
+        })();
+
+        // --- Date helpers ---
+        const startOfMonth = (d) => new Date(d.getFullYear(), d.getMonth(), 1);
+        const endOfMonth = (d) => new Date(d.getFullYear(), d.getMonth() + 1, 0);
+        const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
+        const addMonths = (d, n) => new Date(d.getFullYear(), d.getMonth() + n, 1);
+        const fmtISO = (d) => d.toISOString().slice(0, 10);
+        const monthInputVal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+        function daysBetweenInclusive(aISO, bISO) {
+            const a = new Date(aISO), b = new Date(bISO);
+            return Math.max(0, Math.round((b - a) / (1000 * 60 * 60 * 24))) + 1; // inclusive
         }
 
+        // overlap between [A,B] and [Mstart,Mend] (inclusive), return {offset, windowDays, monthDays, prevCont, nextCont}
+        function monthOverlap(product, viewStart) {
+            const monthStart = startOfMonth(viewStart);
+            const monthEnd = endOfMonth(viewStart);
+            const monthTotal = daysInMonth(monthStart.getFullYear(), monthStart.getMonth());
+
+            const pStart = new Date(product.start);
+            const pEnd = new Date(product.end);
+
+            const overlapStart = new Date(Math.max(pStart, monthStart));
+            const overlapEnd = new Date(Math.min(pEnd, monthEnd));
+
+            let offset = 0, windowDays = 0;
+            if (overlapEnd >= overlapStart) {
+                offset = Math.round((overlapStart - monthStart) / (1000 * 60 * 60 * 24));
+                windowDays = daysBetweenInclusive(fmtISO(overlapStart), fmtISO(overlapEnd));
+            }
+
+            const prevCont = pStart < monthStart;
+            const nextCont = pEnd > monthEnd;
+
+            return { offset, windowDays, monthDays: monthTotal, prevCont, nextCont };
+        }
+
+        function renderTable() {
+            const items = readAll();
+            $tbody.innerHTML = items.map((it, i) => {
+                const span = `${it.start} → ${it.end}`;
+                const days = daysBetweenInclusive(it.start, it.end);
+                return `<tr>
+          <td>${it.name}</td>
+          <td>${it.sku || "-"}</td>
+          <td>$${Number(it.price).toFixed(2)}</td>
+          <td>${it.qty}</td>
+          <td>${span}</td>
+          <td>${days}</td>
+          <td>
+            <button class="btn btn--ghost" data-edit="${i}">Edit</button>
+            <button class="btn btn--ghost" data-view="${i}">View Timeline</button>
+            <button class="btn btn--ghost" data-del="${i}">Delete</button>
+          </td>
+        </tr>`;
+            }).join("");
+        }
+
+        function resetForm() {
+            editingIndex = null;
+            $form.reset();
+        }
+
+        function syncMonthPicker() {
+            if (!viewMonth) return;
+            $monthPicker.value = monthInputVal(viewMonth);
+        }
+
+        // --- Timeline ---
+        function renderTimeline(product, keepMonth = false) {
+            if (!product) return;
+            lastProduct = product;
+            $card.style.display = "block";
+            $meta.textContent = `${product.name} • ${product.start} → ${product.end} (${daysBetweenInclusive(product.start, product.end)} days)`;
+
+            if (!keepMonth) {
+                // default: jump view to product's start month
+                viewMonth = startOfMonth(new Date(product.start));
+                syncMonthPicker();
+            }
+
+            const { offset, windowDays, monthDays, prevCont, nextCont } = monthOverlap(product, viewMonth);
+
+            // Continuation badges
+            let contMsg = [];
+            if (prevCont) contMsg.push("continues from previous month");
+            if (nextCont) contMsg.push("continues into next month");
+            $cont.textContent = contMsg.length ? contMsg.join(" • ") : "";
+
+            const dsOffset = { label: "Offset", data: [offset], backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 0, stack: "x", borderSkipped: false };
+            const dsWindow = { label: "Delivery Window", data: [windowDays], backgroundColor: "#6aa9ff", stack: "x", borderWidth: 0, borderSkipped: false };
+            const tail = Math.max(0, monthDays - offset - windowDays);
+            const dsTail = { label: "", data: [tail], backgroundColor: "rgba(255,255,255,0.03)", stack: "x", borderWidth: 0, borderSkipped: false, hidden: true }; // keep scale full width
+
+            const label = viewMonth.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+
+            if (tlChart) tlChart.destroy();
+            tlChart = new Chart($canvas, {
+                type: "bar",
+                data: { labels: [label], datasets: [dsOffset, dsWindow, dsTail] },
+                options: {
+                    indexAxis: "y",
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: { min: 0, max: monthDays, ticks: { stepSize: 2 } },
+                        y: { stacked: true }
+                    }
+                }
+            });
+        }
+
+        // --- Table actions ---
+        $tbody.addEventListener("click", (e) => {
+            const btn = e.target;
+            const idxEdit = btn.getAttribute("data-edit");
+            const idxDel = btn.getAttribute("data-del");
+            const idxView = btn.getAttribute("data-view");
+            const items = readAll();
+
+            if (idxEdit !== null) {
+                const it = items[Number(idxEdit)];
+                $name.value = it.name;
+                $sku.value = it.sku || "";
+                $price.value = it.price;
+                $qty.value = it.qty;
+                $start.value = it.start;
+                $end.value = it.end;
+                editingIndex = Number(idxEdit);
+                renderTimeline(it); // show and jump to start month
+            }
+
+            if (idxView !== null) {
+                const it = items[Number(idxView)];
+                renderTimeline(it); // show and jump to start month
+            }
+
+            if (idxDel !== null) {
+                const deleted = items.splice(Number(idxDel), 1);
+                writeAll(items);
+                renderTable();
+                if (lastProduct && deleted[0] && deleted[0].name === lastProduct.name) {
+                    if (tlChart) tlChart.destroy();
+                    document.getElementById("timelineCard").style.display = "none";
+                    lastProduct = null;
+                }
+            }
+        });
+
+        // --- Form submission ---
         $form.addEventListener("submit", (e) => {
             e.preventDefault();
+            // Determine qty: if this product was just added from the About page (incomingAdd)
+            // the form was preloaded with qty=1. Preserve the stored quantity unless the user
+            // explicitly changes it to a different number.
+            let formQty = Number($qty.value);
+            if (editingIndex !== null && incomingAdd) {
+                // If the user left the qty as 1, keep the original stored qty instead
+                if (formQty === 1 && incomingOriginalQty != null) formQty = incomingOriginalQty;
+            }
+
+            const record = {
+                name: $name.value.trim(),
+                sku: $sku.value.trim(),
+                price: Number($price.value),
+                qty: formQty,
+                start: $start.value,
+                end: $end.value
+            };
             const items = readAll();
-            const record = { title: $title.value.trim(), value: $value.value.trim() };
-            if (editingIndex === null) { items.push(record); } else { items[editingIndex] = record; }
-            writeAll(items); editingIndex = null; $form.reset(); render();
+
+            if (new Date(record.end) < new Date(record.start)) {
+                alert("Delivery End must be on or after Delivery Start.");
+                return;
+            }
+
+            if (editingIndex === null) { items.push(record); }
+            else { items[editingIndex] = record; }
+
+            writeAll(items);
+            renderTable();
+            renderTimeline(record); // jump to its start month
+            // clear incoming flags after save so subsequent edits behave normally
+            incomingAdd = false;
+            incomingOriginalQty = null;
+            resetForm();
         });
 
-        $tbody.addEventListener("click", (e) => {
-            const idxEdit = e.target.getAttribute("data-edit");
-            const idxDel = e.target.getAttribute("data-del");
-            if (idxEdit !== null) {
-                const items = readAll(); const it = items[Number(idxEdit)];
-                $title.value = it.title; $value.value = it.value; editingIndex = Number(idxEdit);
-            }
-            if (idxDel !== null) {
-                const items = readAll(); items.splice(Number(idxDel), 1); writeAll(items); render();
-            }
+        $reset.addEventListener("click", resetForm);
+
+        // Month controls
+        $monthPicker.addEventListener("change", () => {
+            if (!lastProduct || !$monthPicker.value) return;
+            const [y, m] = $monthPicker.value.split("-").map(Number);
+            viewMonth = new Date(y, m - 1, 1);
+            renderTimeline(lastProduct, true);
         });
 
-        $reset.addEventListener("click", () => { editingIndex = null; $form.reset(); });
+        $prev.addEventListener("click", () => {
+            if (!lastProduct) return;
+            viewMonth = addMonths(viewMonth || new Date(), -1);
+            syncMonthPicker();
+            renderTimeline(lastProduct, true);
+        });
+
+        $next.addEventListener("click", () => {
+            if (!lastProduct) return;
+            viewMonth = addMonths(viewMonth || new Date(), 1);
+            syncMonthPicker();
+            renderTimeline(lastProduct, true);
+        });
 
         // boot
-        document.getElementById("year").textContent = new Date().getFullYear();
-        render();
+        // If page was opened with query params (e.g., from add-to-cart), use them to prefill or select the product
+        function handleIncomingParams() {
+            const qs = new URLSearchParams(location.search);
+            const sku = qs.get('sku');
+            const name = qs.get('name');
+            const price = qs.get('price');
+
+            if (!sku && !name && !price) return; // nothing to do
+
+            const items = readAll();
+            // try to find item by sku (prefer), then by name
+            let idx = -1;
+            if (sku) idx = items.findIndex(i => (i.sku || '').toString().toLowerCase() === sku.toLowerCase());
+            if (idx === -1 && name) idx = items.findIndex(i => (i.name || '').toString().toLowerCase() === name.toLowerCase());
+
+            if (idx === -1) {
+                // not found — create a new product with defaults and persist it
+                const today = new Date();
+                const fmt = d => d.toISOString().slice(0, 10);
+                const plus = days => { const x = new Date(today); x.setDate(x.getDate() + days); return fmt(x); };
+                const rec = {
+                    name: name || '(No name)',
+                    sku: sku || '',
+                    price: Number(price || 0),
+                    qty: 1,
+                    start: fmt(today),
+                    end: plus(5)
+                };
+                items.push(rec);
+                writeAll(items);
+                idx = items.length - 1;
+            }
+
+            // Prefill form for editing the found/created product and render timeline
+            const it = readAll()[idx];
+            $name.value = it.name || '';
+            $sku.value = it.sku || '';
+            $price.value = it.price || '';
+            // When arriving from the About page via add-to-cart, ALWAYS preload qty as 1 in the form
+            // but preserve the original stored qty so saving doesn't unexpectedly overwrite it.
+            incomingAdd = true;
+            incomingOriginalQty = Number(it.qty || 0);
+            $qty.value = 1;
+            $start.value = it.start || '';
+            $end.value = it.end || '';
+            editingIndex = idx;
+            renderTable();
+            renderTimeline(it);
+
+            // remove params from URL to avoid repeated handling on refresh
+            if (history && history.replaceState) history.replaceState(null, '', location.pathname);
+        }
+
+        renderTable();
+        handleIncomingParams();
     </script>
 </body>
 

@@ -1,10 +1,13 @@
+<!-- Author: Domenick Dobbs
+Date: 9/27/2025
+Assignments: Distributed Information Systems - Assignment 1 -->
 <!doctype html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Assignment 1 · About</title>
+    <title>Dobby's E-Commerce · About</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css" />
@@ -14,35 +17,49 @@
     <header class="site-header">
         <a class="brand" href="index.html">
             <img src="img/logo.png" alt="Logo" class="brand__logo">
-            <span class="brand__name">Assignment 1</span>
+            <span class="brand__name">Dobby's E-Commerce</span>
         </a>
         <nav class="nav">
             <a class="nav__link" href="index.html">Home</a>
             <a class="nav__link nav__link--active" href="aboutus.html">About</a>
-            <a class="nav__link" href="crud.html">CRUD</a>
+            <a class="nav__link" href="crud.html">Catalog (CRUD)</a>
             <a class="nav__link" href="analytics.html">Analytics</a>
         </nav>
     </header>
 
     <main class="container">
-        <section class="card">
-            <h1 class="h1">About Me</h1>
-            <p class="lead">
-                Hello! I'm Domenick Dobbs, a graduate student at the University of South Florida pursuing a Master's in
-                AI. With a background in web development, Data Science, and AI programming; I specialize in building
-                responsive and accessible tools for customers. This project showcases my lesser used skills in HTML,
-                CSS, and JavaScript, along with my ability to implement CRUD functionality and data visualization using
-                Chart.js. I'm excited to share my work with you!
-            </p>
+        <!-- Store-style Hero -->
+        <section class="hero">
+            <div class="grid grid--2">
+                <div>
+                    <h1 class="h1">About Dobby’s E-Commerce</h1>
+                    <p class="lead">
+                        A cozy corner of the web where enchanted mugs, house-elf socks, and other whimsical goods ship
+                        fast.
+                        This demo storefront showcases clean HTML, modern CSS, and vanilla JS with CRUD and analytics
+                        features.
+                    </p>
+                    <div class="mt-3">
+                        <a class="btn btn--primary" href="crud.html">Browse Catalog</a>
+                        <a class="btn btn--ghost" href="analytics.html">See Store Analytics</a>
+                    </div>
+                </div>
+                <div>
+                    <img src="img/Hero.png" alt="Shop preview"
+                        style="width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(0,0,0,.35)">
+                </div>
+            </div>
         </section>
 
+        <!-- “Our Story” + Tech Stack -->
         <section class="grid grid--2 mt-4">
             <article class="card">
-                <h2 style="margin:.2rem 0 .6rem">My Approach</h2>
+                <h2 style="margin:.2rem 0 .6rem">Our Story</h2>
                 <p>
-                    I start with building out the structure in html. Then I add styles using CSS custom properties which
-                    I often find inspiration from online. Finally I add interactivity with vanilla JavaScript. The
-                    goal is to keep things simple, clean, and easy to build on if need be.
+                    Dobby's E-Commerce started as a class project and grew into a polished demo for a modern storefront
+                    UX.
+                    The focus is on accessibility, performance, and code clarity—so product pages feel quick,
+                    approachable, and easy to extend.
                 </p>
                 <ul class="mt-3" style="padding-left:1.1rem; margin:0">
                     <li>Clean, readable code</li>
@@ -55,23 +72,100 @@
                 <h2 style="margin:.2rem 0 .6rem">Tech Stack</h2>
                 <ul style="padding-left:1.1rem; margin:0">
                     <li><strong>HTML5</strong> for structure</li>
-                    <li><strong>CSS</strong> with custom properties for a modern theme</li>
-                    <li><strong>JavaScript</strong> (vanilla) for simple interactions</li>
-                    <li><strong>Chart.js</strong> on the Analytics page (via CDN)</li>
-                    <li><strong>D3.js</strong> on the Analytics page (via CDN)</li>
+                    <li><strong>CSS</strong> custom properties for theming</li>
+                    <li><strong>JavaScript</strong> (vanilla) for interactivity</li>
+                    <li><strong>Chart.js</strong> &amp; <strong>D3.js</strong> for analytics</li>
                 </ul>
 
                 <div class="mt-3">
                     <a class="btn btn--primary" href="https://github.com/DomenickD/Distributed-info-systems-a1"
                         target="_blank" rel="noopener">View Source</a>
-                    <a class="btn btn--ghost" href="analytics.html">See Analytics</a>
+                    <a class="btn btn--ghost" href="crud.html">Open Catalog</a>
                 </div>
             </article>
         </section>
 
+        <!-- Featured Items mini gallery (PNG images) -->
+        <section class="mt-4">
+            <h2 class="h1" style="font-size:1.4rem">Featured Items</h2>
+            <div class="grid grid--3 mt-3">
+                <article class="card">
+                    <img src="img/mug.png" alt="Enchanted Mug" style="width:100%;border-radius:12px">
+                    <div class="mt-2">
+                        <strong>Enchanted Mug</strong>
+                        <p class="mt-2" style="color:var(--muted)">Keeps your tea warm with a little magic.</p>
+                        <div class="mt-2">
+                            <span class="btn btn--ghost">$19.99</span>
+                            <button class="btn btn--primary add-to-cart" data-sku="DOB-001" data-name="Enchanted Mug"
+                                data-price="19.99">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="img/socks.png" alt="House-Elf Socks" style="width:100%;border-radius:12px">
+                    <div class="mt-2">
+                        <strong>House-Elf Socks (Pair)</strong>
+                        <p class="mt-2" style="color:var(--muted)">Soft, charming, and freedom-friendly.</p>
+                        <div class="mt-2">
+                            <span class="btn btn--ghost">$7.50</span>
+                            <button class="btn btn--primary add-to-cart" data-sku="DOB-002"
+                                data-name="House-Elf Socks (Pair)" data-price="7.50">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <img src="img/journal.png" alt="Spellbook Journal" style="width:100%;border-radius:12px">
+                    <div class="mt-2">
+                        <strong>Spellbook Journal</strong>
+                        <p class="mt-2" style="color:var(--muted)">Lined pages for everyday incantations.</p>
+                        <div class="mt-2">
+                            <span class="btn btn--ghost">$14.00</span>
+                            <button class="btn btn--primary add-to-cart" data-sku="DOB-003"
+                                data-name="Spellbook Journal" data-price="14.00">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Store Policies (accordion) -->
+        <section class="mt-4 card">
+            <h2 style="margin:.2rem 0 .6rem">Store Policies</h2>
+
+            <details class="mt-2">
+                <summary class="label" style="cursor:pointer">Shipping</summary>
+                <p class="mt-2" style="color:var(--muted)">
+                    Orders ship within 1–2 business days. Delivery windows are visible in the Catalog timeline.
+                </p>
+            </details>
+
+            <details class="mt-2">
+                <summary class="label" style="cursor:pointer">Returns</summary>
+                <p class="mt-2" style="color:var(--muted)">
+                    Free returns within 30 days in original condition. House-elf socks are returnable if unworn.
+                </p>
+            </details>
+
+            <details class="mt-2">
+                <summary class="label" style="cursor:pointer">Support</summary>
+                <p class="mt-2" style="color:var(--muted)">
+                    Need help? Use the contact form below or email support@dobbys-store.example.
+                </p>
+            </details>
+        </section>
+
+        <!-- Contact -->
         <section class="mt-4 card">
             <h2 style="margin:.2rem 0 .6rem">Contact</h2>
-            <form class="form" onsubmit="event.preventDefault(); alert('Message sent (This is just a demo)!');">
+            <form class="form" onsubmit="event.preventDefault(); alert('Message sent (demo)!');">
                 <div>
                     <label class="label" for="name">Name</label>
                     <input class="input" id="name" placeholder="Your name" required />
@@ -90,12 +184,111 @@
     </main>
 
     <footer class="site-footer">
-        <p>© <span id="year"></span> Domenick Dobbs • <a
-                href="https://https://github.com/DomenickD/Distributed-info-systems-a1" target="_blank"
-                rel="noopener">GitHub Repo</a></p>
+        <p>© <span id="year"></span> Domenick Dobbs •
+            <a href="https://github.com/DomenickD/Distributed-info-systems-a1" target="_blank" rel="noopener">GitHub
+                Repo</a>
+        </p>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script>
+        // year
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // ---- Add-to-Cart wiring (writes to the same storage the CRUD page uses) ----
+        const STORAGE_KEY = "dobbyCatalog";
+        function readCatalog() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+        function writeCatalog(items) { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+        function addOrUpdateProduct({ sku, name, price }) {
+            // normalize inputs and guard against undefined
+            const items = readCatalog();
+            const skuKey = (sku || "").toString();
+            const skuKeyLower = skuKey.toLowerCase();
+            const idx = items.findIndex(p => ((p.sku || "").toString().toLowerCase()) === skuKeyLower);
+
+            // Default delivery window: today → today+5 (so the timeline shows immediately)
+            const today = new Date();
+            const fmt = d => d.toISOString().slice(0, 10);
+            const plus = days => { const x = new Date(today); x.setDate(x.getDate() + days); return fmt(x); };
+
+            const normalizedPrice = Number(price || 0);
+
+            const newRow = {
+                lineId: Date.now(),
+                name: name || "(No name)",
+                sku: skuKey || "",
+                price: normalizedPrice,
+                qty: 1,
+                start: fmt(today),
+                end: plus(5)
+            };
+
+            items.push(newRow);
+            // if (idx === -1) {
+            //     items.push({
+            //         name: name || "(No name)",
+            //         sku: skuKey || "",
+            //         price: normalizedPrice,
+            //         qty: 1,
+            //         start: fmt(today),
+            //         end: plus(5)
+            //     });
+            // } else {
+            //     // Increment quantity if it already exists
+            //     items[idx].qty = Number(items[idx].qty || 0) + 1;
+            //     // Ensure start/end exist for timeline
+            //     items[idx].start = items[idx].start || fmt(today);
+            //     items[idx].end = items[idx].end || plus(5);
+            //     // normalize price if missing
+            //     if (items[idx].price == null) items[idx].price = normalizedPrice;
+            // }
+
+            writeCatalog(items);
+        }
+
+        // Attach to all buttons
+        document.querySelectorAll(".add-to-cart").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                // Build payload and validate required fields
+                const payload = {
+                    sku: btn.dataset.sku,
+                    name: btn.dataset.name,
+                    price: btn.dataset.price
+                };
+
+                if (!payload.name) {
+                    console.warn('add-to-cart: missing name on button', btn);
+                    // still navigate to catalog
+                    window.location.href = "crud.html";
+                    return;
+                }
+
+                try {
+                    addOrUpdateProduct(payload);
+                } catch (err) {
+                    // always gotta catch those errors
+                    console.error('add-to-cart: failed to add product', err);
+                }
+
+                // Navigate to catalog and include the item as query params so the Catalog page can prefill the form
+                const params = new URLSearchParams();
+                if (payload.sku) params.set('sku', payload.sku);
+                if (payload.name) params.set('name', payload.name);
+                if (payload.price) params.set('price', payload.price);
+                const url = 'crud.html' + (params.toString() ? ('?' + params.toString()) : '');
+
+                // short delay to ensure the write has completed in the browser before navigation
+                setTimeout(() => { window.location.href = url; }, 60);
+            });
+        });
+
+        const accordions = document.querySelectorAll("details");
+        accordions.forEach(d => {
+            d.addEventListener("toggle", () => {
+                if (d.open) accordions.forEach(o => { if (o !== d) o.removeAttribute("open"); });
+            });
+        });
+    </script>
 </body>
 
 </html>
