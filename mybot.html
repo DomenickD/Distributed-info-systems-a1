@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>My Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <a class="brand" href="index.html"><img src="img/logo.png" class="brand__logo" alt="Logo">
+            <span class="brand__name">Dobby's E-Commerce</span></a>
+        <nav class="nav">
+            <a class="nav__link" href="index.html">Home</a>
+            <a class="nav__link" href="aboutus.html">About</a>
+            <a class="nav__link" href="crud.html">Catalog (CRUD)</a>
+            <a class="nav__link" href="analytics.html">Analytics</a>
+            <a class="nav__link nav__link--active" href="mybot.html">Chat with the Bot</a>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <section class="hero">
+                <h1 class="h1">Chat with the Bot</h1>
+                <p class="lead">Ask product questions, get recommendations, or try the demo assistant. If the chat
+                    widget does not appear automatically, click the button below.</p>
+
+                <div class="grid" style="align-items:center">
+                    <div>
+                        <p class="mt-2">The chat widget should appear as a floating widget (bottom-right). If it
+                            doesn't appear automatically, try reloading the page or check your browser console for
+                            blocked resources.</p>
+                        <p class="idk">It was decided the widget at the bottom looked better.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js" defer></script>
+    <script src="https://files.bpcontent.cloud/2025/10/26/12/20251026125823-AEW59IDG.js" defer></script>
+
+    <script>
+        window.addEventListener('load', () => {
+            const tryOpen = () => {
+                try {
+                    if (window.botpressWebChat?.open) {
+                        window.botpressWebChat.open();
+                        return true;
+                    }
+                    if (window.botpressWebChat?.sendEvent) {
+                        window.botpressWebChat.sendEvent({ type: 'show' });
+                        return true;
+                    }
+                } catch (e) { }
+                return false;
+            };
+
+            let attempts = 0;
+            const iv = setInterval(() => {
+                attempts++;
+                if (tryOpen() || attempts > 20) clearInterval(iv);
+            }, 250);
+        });
+    </script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
